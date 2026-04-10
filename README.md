@@ -1,7 +1,10 @@
 # excel_importer
  - GodotでExcelからデータをインポートするアドオン
- - WindowsでPython3の環境が必要.
+ - 決まったフォーマットでExcelにデータを入力し、Godotエディタ上のボタンを押下することでデータが定義されたGDScriptを生成します.
+ - Windows+Python3の環境で動作.
  - Godot4.6で動作確認.
+   
+![Image](https://github.com/user-attachments/assets/6b91d17c-b166-4ec5-a73e-dd96f317b875)
 
 ## 事前準備
 PythonをWindowsバッチから起動しているので以下環境構築が必要になります.
@@ -23,6 +26,8 @@ resource/enum
 resource/input
 resource/output
 ```
+<br>
+
 4. Excelファイルを作成
 resource/inputにあるエクセルファイルを参照
 	- 拡張子は.xlsxのみ対応
@@ -45,13 +50,19 @@ resource/inputにあるエクセルファイルを参照
  		* name: データ名 重複しないように データを取得するときに使う 必須
  		* group_id: レコードのグループID、string or name,レコードをまとめて取得したいとき等に使う 不要なら列自体消していい
 	- 翻訳データをExcelで登録する場合はシート名を xxxx.csvにするとcsvファイルとしてインポートされる (※resource/input/TextData.xlsxを参照)
+<img width="1070" height="279" alt="Image" src="https://github.com/user-attachments/assets/0e3f2ea7-7fcc-4391-84d0-f3a6934a9235" />
+<br>
+<br>
 
 5. Excelファイルのインポート
 	1. 追加されたExcelImporterという名前のドックを開く
 	2. Import from Excel ボタンを押下
 	3. 設定した出力フォルダ(デフォルト resource/output)配下にgdscriptのファイルができる
-	
-6. EnumをExcelのドロップダウンリストに登録する
+<img width="1220" height="262" alt="Image" src="https://github.com/user-attachments/assets/7609281f-0f57-4980-b078-476dff51d025" />
+<br>
+<br>
+
+6. EnumをExcelのドロップダウンリストに登録する(任意)
 	1. 追加されたExcelImporterという名前のドックを開く
 	2. 「Export Enum to Json」 ボタンを押下
 	3. gdscript上で書かれたenum定義が resource/enum配下にjsonで出力される
@@ -60,6 +71,7 @@ resource/inputにあるエクセルファイルを参照
 	6. 「Convert Enum To Excel Dropdown」 ボタンを押下
 	7. Excel にドロップダウンリストが登録されている
 	※ ドロップダウンリストには文字数制限があるようなので失敗するとExcelファイルが壊れる場合があります。使用する場合は注意。
+<br>
 
 7. スクリプト上で登録したデータを使用する
 ```gdscript
@@ -121,6 +133,7 @@ var record = access.find_by_id(1)
 _add_log(JSON.stringify(record))
 _add_log("")
 ```
+<br>
 
 8. 出力パス等の設定を変更したい場合
 	- プロジェクト設定 > 一般 > Lib > Master から入出力フォルダパス等の設定が可能

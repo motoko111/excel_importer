@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bgxl01ihm2c8o"]
+
+[ext_resource type="Script" uid="uid://cp7w5bs6cud0" path="res://addons/excel_importer/excel2csv/platform/godot/master/master_data_test.gd" id="1_eprus"]
+
+[node name="MasterDataTest" type="Node2D" unique_id=30415063]
+script = ExtResource("1_eprus")

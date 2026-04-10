@@ -1,0 +1,38 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="excel_impoter"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/excel_importer/plugin.cfg")
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://resource/output/csv/text_data.en.translation", "res://resource/output/csv/text_data.jp.translation", "res://resource/output/csv/text_data.ko.translation", "res://resource/output/csv/text_data.zh_CN.translation", "res://resource/output/csv/text_data.zh_TW.translation")
+
+[lib]
+
+master/convert_enum_target_file_regex=".*"
+master/resource_output_path="res://resource/output"
+master/resource_input_path="res://resource/input"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

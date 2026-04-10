@@ -1,0 +1,2 @@
+# excel_importer
+GodotでExcelからデータをインポートするアドオン

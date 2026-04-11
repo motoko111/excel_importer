@@ -84,12 +84,6 @@ print(JSON.stringify(records))
 ```
 
 ```gdscript
-# 全レコードの取得
-var records = TestDataManager.get_instance().get_records()
-var records = DataAsset.get_data("TestData").get_records()
-```
-
-```gdscript
 # 指定グループIDのレコードの取得
 var records = TestDataManager.get_instance().find_by_group_id(&"GROUP_1")
 ```
@@ -124,14 +118,10 @@ access.add({
 	val_int = 2000,
 	val_str = "test dayo 2"
 })
-_add_log("_test_create_custom_data_access: get_records")
 var records = access.get_records()
-_add_log(JSON.stringify(records))
-_add_log("")
-_add_log("_test_create_custom_data_access: find_by_id 1")
+print(JSON.stringify(records))
 var record = access.find_by_id(1)
-_add_log(JSON.stringify(record))
-_add_log("")
+print(JSON.stringify(record))
 ```
 <br>
 

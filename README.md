@@ -33,8 +33,8 @@ resource/inputにあるエクセルファイルを参照
 	- 拡張子は.xlsxのみ対応
 	- シートにデータ名を入力. ※シート単位でデータテーブルを出力(シート名がデータ名 {データ名}Manager or DataAsset.get_data("{データ名}")で呼び出す)
 	- 1行目、1列目に#と入力するとその行列はコメントアウト扱いになる
-	- 1行目 フィールド名 実際にGDScriptで使用する際の名前
-	- 2行目 フィールドの型 id,name,string,int,float,double,bool,enumの型名のいずれか
+	- 2行目 フィールド名 実際にGDScriptで使用する際の名前
+	- 3行目 フィールドの型 id,name,string,int,float,double,bool,enumの型名のいずれか
  		* id:int型
  		* name:StringName型
  		* string:String型
@@ -43,8 +43,8 @@ resource/inputにあるエクセルファイルを参照
  		* double:double型
  		* bool:bool型
  		* enum: class名.enum名 のように入力して値にenumの値を設定するとそのenumの値をデータに設定できる
-	- 3行目 情報 フィールドの説明 空欄でもいい
-	- 4行目以降に各レコードのデータを入力
+	- 4行目 情報 フィールドの説明 空欄でもいい
+	- 5行目以降に各レコードのデータを入力
 	- 特別なフィールド名
  		* id: データ番号 使用しない場合は重複してもいい データを取得するときに使う 必須
  		* name: データ名 重複しないように データを取得するときに使う 必須

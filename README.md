@@ -40,7 +40,6 @@ resource/inputにあるエクセルファイルを参照
  		* string:String型
  		* int:int型
  		* float:float型
- 		* double:double型
  		* bool:bool型
  		* enum: class名.enum名 のように入力して値にenumの値を設定するとそのenumの値をデータに設定できる
 	- 4行目 情報 フィールドの説明 空欄でもいい
@@ -66,7 +65,7 @@ resource/inputにあるエクセルファイルを参照
 	1. 追加されたExcelImporterという名前のドックを開く
 	2. 「Export Enum to Json」 ボタンを押下
 	3. gdscript上で書かれたenum定義が resource/enum配下にjsonで出力される
-	4. ドロップダウンリストを登録(更新)したいExcelのファイル名の正規表現を「convert enum to excel > target file regex」に入力 (".*"なら全ファイル "Test.*"なら Test〇〇というファイルを対象)
+	4. ドロップダウンリストを登録(更新)したいExcelのファイル名の正規表現を「convert enum to excel > target file regex」に入力 (".\*"なら全ファイル "Test.\*"なら Test〇〇というファイルを対象)
 	5. 対象のExcelファイルを閉じる
 	6. 「Convert Enum To Excel Dropdown」 ボタンを押下
 	7. Excel にドロップダウンリストが登録されている

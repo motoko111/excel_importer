@@ -34,7 +34,7 @@ resource/inputにあるエクセルファイルを参照
 	- シートにデータ名を入力. ※シート単位でデータテーブルを出力(シート名がデータ名 {データ名}Manager or DataAsset.get_data("{データ名}")で呼び出す)
 	- 1行目、1列目に#と入力するとその行列はコメントアウト扱いになる
 	- 2行目 フィールド名 実際にGDScriptで使用する際の名前
-	- 3行目 フィールドの型 id,name,string,int,float,double,bool,enumの型名のいずれか
+	- 3行目 フィールドの型 id,name,string,int,float,bool,enumの型名のいずれか
  		* id:int型
  		* name:StringName型
  		* string:String型

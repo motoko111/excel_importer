@@ -9,8 +9,8 @@ var records = {}
 var custom = {}
 
 func _init():
-	DataAsset.register(data_name, self)
 	var master_data_type:StringName = StringName(data_name)
+	DataAsset.register(master_data_type, self)
 	for record in records:
 		record.master_data_type = master_data_type
 		if record.has("name"):

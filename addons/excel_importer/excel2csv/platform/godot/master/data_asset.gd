@@ -21,7 +21,7 @@ static func get_instance():
 		s_instance = DataAsset.new()
 	return s_instance
 
-static func register(data_name, data):
+static func register(data_name:StringName, data):
 	get_instance().master[data_name]= data
 
 static func clear():
@@ -47,7 +47,7 @@ static func _create_data_instance(data_name):
 			register(data_name, data)
 			return
 
-static func get_data(data_name):
+static func get_data(data_name:StringName) -> MasterDataManager:
 	if !get_instance().master.has(data_name):
 		_create_data_instance(data_name)
 		if get_instance().master.has(data_name):
@@ -55,28 +55,28 @@ static func get_data(data_name):
 		return null
 	return get_instance().master[data_name]
 
-static func get_records(data_name):
+static func get_records(data_name:StringName):
 	return get_data(data_name).get_records()
 	
-static func get_name_map_records(data_name):
+static func get_name_map_records(data_name:StringName):
 	return get_data(data_name).get_name_map_records()
 
-static func get_id_map_records(data_name):
+static func get_id_map_records(data_name:StringName):
 	return get_data(data_name).get_id_map_records()
 
-static func get_fields(data_name):
+static func get_fields(data_name:StringName):
 	return get_data(data_name).get_fields()
 
-static func find_by_id(data_name,id):
+static func find_by_id(data_name:StringName,id):
 	return get_data(data_name).find_by_id(id)
 
-static func find_by_name(data_name,name):
+static func find_by_name(data_name:StringName,name):
 	return get_data(data_name).find_by_name(name)
 	
-static func find_by_group_id(data_name,groupId):
+static func find_by_group_id(data_name:StringName,groupId):
 	return get_data(data_name).find_by_group_id(groupId)
 	
-static func find_by_custom_field(data_name,field,value):
+static func find_by_custom_field(data_name:StringName,field,value):
 	return get_data(data_name).find_by_custom_field(field,value)
 
 static func get_data_master():

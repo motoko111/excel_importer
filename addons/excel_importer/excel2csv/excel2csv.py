@@ -183,6 +183,9 @@ def analys_sheet_all(wb):
     '''
     tables = []
     for sheetName in wb.sheetnames:
+        # _から始まるシート名は除外
+        if sheetName.startswith("_"):
+            continue
         ws = wb[sheetName]
         tables.append(analys_sheet(ws))
     return tables

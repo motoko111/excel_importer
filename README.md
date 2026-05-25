@@ -31,7 +31,7 @@ resource/output
 4. Excelファイルを作成
 resource/inputにあるエクセルファイルを参照
 	- 拡張子は.xlsxのみ対応
-	- シートにデータ名を入力. ※シート単位でデータテーブルを出力(シート名がデータ名 {データ名}Manager or DataAsset.get_data("{データ名}")で呼び出す)
+	- シートにデータ名を入力. ※シート単位でデータテーブルを出力(シート名がデータ名 {データ名}Manager or DataAsset.get_data("{データ名}")で呼び出す) "_"で開始するシートは読み込まれない
 	- 1行目、1列目に#と入力するとその行列はコメントアウト扱いになる
 	- 2行目 フィールド名 実際にGDScriptで使用する際の名前
 	- 3行目 フィールドの型 id,name,string,int,float,bool,enumの型名のいずれか
@@ -68,8 +68,7 @@ resource/inputにあるエクセルファイルを参照
 	4. ドロップダウンリストを登録(更新)したいExcelのファイル名の正規表現を「convert enum to excel > target file regex」に入力 (".\*"なら全ファイル "Test.\*"なら Test〇〇というファイルを対象)
 	5. 対象のExcelファイルを閉じる
 	6. 「Convert Enum To Excel Dropdown」 ボタンを押下
-	7. Excel にドロップダウンリストが登録されている
-	※ ドロップダウンリストには文字数制限があるようなので失敗するとExcelファイルが壊れる場合があります。使用する場合は注意。
+	7. Excel に_enumsシートが追加されドロップダウンリストが登録されている
 <br>
 
 7. スクリプト上で登録したデータを使用する

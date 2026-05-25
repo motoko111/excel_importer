@@ -3,11 +3,15 @@ import os
 import sys
 import re
 from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
 INPUT_DIR = "input"
 INPUT_ENUM_FILE_PATH = "enum/enum_list.json"
 TARGET_FILE_REGEX = ".*"
+
+# enum値を格納する専用シート名
+ENUM_SHEET_NAME = "_enums"
 
 if len(sys.argv) >= 2 and len(sys.argv[1]) > 0:
     INPUT_DIR = sys.argv[1]
@@ -20,6 +24,56 @@ if len(sys.argv) >= 4 and len(sys.argv[3]) > 0:
     print("対象となるファイル正規表現を設定:" + TARGET_FILE_REGEX)
 
 
+def write_enum_sheet(wb, enum_map: dict[str, list[str]], needed_keys: set[str]) -> dict[str, str]:
+    """
+    enum定義のうち、対象シートで実際に使われているキー(needed_keys)だけを
+    専用シート(_enums)に列ごとに書き込み、
+    各enumキーに対応する範囲参照文字列(formula1で使う形式)を返す。
+
+    レイアウト:
+        row1: enumキー名(ヘッダー)
+        row2以降: enum値(縦方向)
+
+    Args:
+        wb: 対象ワークブック
+        enum_map: JSONから読み込んだenum定義全体
+        needed_keys: 対象シートのヘッダー行に存在し、書き込みが必要なキーの集合
+
+    Returns:
+        dict[str, str]: { enumキー名: "'_enums'!$A$2:$A$51" のような範囲参照 }
+    """
+    # 既存のenumシートがあれば一旦削除して作り直す(値の追加・削除に追従するため)
+    if ENUM_SHEET_NAME in wb.sheetnames:
+        del wb[ENUM_SHEET_NAME]
+    enum_ws = wb.create_sheet(title=ENUM_SHEET_NAME)
+
+    ref_map: dict[str, str] = {}
+    col_idx = 1
+    for key, values in enum_map.items():
+        # 対象シートで使われていないenumはスキップ(_enumsに書き込まない)
+        if key not in needed_keys:
+            continue
+        if not values:
+            continue
+
+        col_letter = get_column_letter(col_idx)
+        # ヘッダー(1行目)にキー名
+        enum_ws.cell(row=1, column=col_idx, value=key)
+        # 2行目以降に値を縦に並べる
+        for i, v in enumerate(values):
+            enum_ws.cell(row=2 + i, column=col_idx, value=v)
+
+        start_cell = f"${col_letter}$2"
+        end_cell = f"${col_letter}${1 + len(values)}"
+        # シート名をシングルクォートで囲む(スペースや記号を含む場合に安全)
+        ref_map[key] = f"'{ENUM_SHEET_NAME}'!{start_cell}:{end_cell}"
+        col_idx += 1
+
+    # enumシートは参照専用なので非表示にする
+    # enum_ws.sheet_state = "hidden"
+    return ref_map
+
+
 def apply_enum_list_to_excel(
     excel_path: str,
     enum_json_path: str,
@@ -29,8 +83,9 @@ def apply_enum_list_to_excel(
 ):
     """
     Godotで出力したenum定義JSONをもとに、
-    Excel内でキー名と一致する列を検索し、
-    指定行以降のセルをリスト選択に設定する。
+    各Excelファイル内にenum専用シート(_enums)を作成し、
+    対象シートのキー名と一致する列に対して、
+    enumシートの範囲を参照するリスト選択を設定する。
 
     Args:
         excel_path (str): 編集対象のExcelファイル
@@ -43,7 +98,7 @@ def apply_enum_list_to_excel(
     if not(is_target_file_path(excel_path)):
         print(f"対象ファイルの正規表現に一致しないため処理対象から除外します。:{excel_path}")
         return False
-    # 
+    #
     if is_file_locked(excel_path):
          print(f"エラー!!!:{excel_path}のファイルが開かれています。")
          return False
@@ -59,9 +114,27 @@ def apply_enum_list_to_excel(
         return False
     ws = wb[target_sheet]
 
-    updated = 0
     max_col = ws.max_column
     max_row = ws.max_row
+    # データ行が少なくstart_rowを下回る場合は、最低でもstart_rowまで範囲を確保
+    if max_row < start_row:
+        max_row = start_row
+
+    # 先に対象シートのヘッダー行を走査し、実際に使われているenumキーを収集する。
+    # こうすることで、_enumsには必要なenumだけを書き込める。
+    needed_keys: set[str] = set()
+    for col in range(1, max_col + 1):
+        key = ws.cell(row=header_row, column=col).value
+        if not key:
+            continue
+        key = str(key).strip()
+        if key in enum_map:
+            needed_keys.add(key)
+
+    # 対象シートで使われているenumだけを専用シートに書き込み、範囲参照マップを取得
+    ref_map = write_enum_sheet(wb, enum_map, needed_keys)
+
+    updated = 0
 
     # キー探索行の全セルをチェック
     for col in range(1, max_col + 1):
@@ -70,17 +143,9 @@ def apply_enum_list_to_excel(
             continue
 
         key = str(key).strip()
-        if key in enum_map:
-            values = enum_map[key]
-            if not values:
-                continue
+        if key in ref_map:
+            formula = ref_map[key]
 
-            csv = ",".join(values)
-            if len(csv) > 255:
-                print(f"エラー!!!:{key} のリストが長すぎます。")
-                return False
-                #csv = ",".join(values[:10])
-                
             # リスト適用範囲を設定
             start = ws.cell(row=start_row, column=col).coordinate
             end = ws.cell(row=max_row, column=col).coordinate
@@ -96,22 +161,23 @@ def apply_enum_list_to_excel(
             # フィルタリング後の入力規則を再設定
             ws.data_validations.dataValidation = new_validations
 
-            # 指定行以下の全セルにDataValidationを設定
-            dv = DataValidation(type="list", formula1=f'"{csv}"', allow_blank=True)
+            # enumシートの範囲を参照するDataValidationを設定
+            # formula1に範囲参照を指定することで255文字制限を回避
+            dv = DataValidation(type="list", formula1=formula, allow_blank=True)
             ws.add_data_validation(dv)
 
             dv.add(f"{start}:{end}")
 
-            print(f"{key} -> {start}:{end} にリスト設定: {values}")
+            print(f"{key} -> {start}:{end} にリスト設定(参照: {formula})")
             updated += 1
 
-    if updated > 0:
-        try:
-            wb.save(excel_path)
-        except ValueError as e:
-            print(f"エラー!!!:{excel_path}の保存時にエラーが発生しました。ファイルが開かれている場合は閉じてください。\n: {e}")
-            return False
-        print(f"完了: {excel_path} に {updated} 列のリスト選択を設定しました。")
+    # enumシートは書き込んだので、リスト適用が無くても保存する
+    try:
+        wb.save(excel_path)
+    except ValueError as e:
+        print(f"エラー!!!:{excel_path}の保存時にエラーが発生しました。ファイルが開かれている場合は閉じてください。\n: {e}")
+        return False
+    print(f"完了: {excel_path} に {updated} 列のリスト選択を設定しました。")
     return True
 
 def is_file_locked(filepath: str) -> bool:
@@ -126,7 +192,7 @@ def is_file_locked(filepath: str) -> bool:
         return False
     except PermissionError:
         return True
-    
+
 def is_target_file_path(filepath: str) -> bool:
     """ 対象ファイル名が条件に一致しているかチェック """
     return re.match(TARGET_FILE_REGEX, os.path.basename(filepath))
@@ -164,4 +230,3 @@ def main():
     apply_enum_list_to_excel_dir(INPUT_DIR, INPUT_ENUM_FILE_PATH)
 
 main()
-
